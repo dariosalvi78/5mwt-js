@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/kimeiga/bahunya/css/bahunya-0.1.1.css" />
+</head>
+
+<body>
+    <h2 style="text-align: center;">5-minute walk test</h2>
+
+    <main>
+        <article>
+            <h3>Instructions</h3>
+
+            <section>
+                <p>The test consists in walking 3 times over a distance of 5 meters.</p>
+                <p>
+                    Select a straight path in your home such as a corridor.
+                    Mark two points at a measured distance of 5 meters.
+                </p>
+                <p>
+                    To start the test, press the "start" button.
+                    When prompted by this application, walk the first 5 meters, then press the "stop" button.
+                    Turn around, press the "start" button again and walk back to the start point.
+                    Press the "stop" button and repeat the test one more time.
+                </p>
+                <p>
+                    At the end of the test, the average time will be displayed.
+                </p>
+                <button id="startBtn">Start</button>
+            </section>
+
+        </article>
+    </main>
+
+</body>
+
+<script>
+    let startButton = document.getElementById('startBtn')
+    startButton.addEventListener('click', () => {
+        document.location.href = 'test.html'
+    })
+</script>
+
+</html>

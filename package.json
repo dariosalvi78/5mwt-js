@@ -1,0 +1,26 @@
+{
+  "name": "5mwt",
+  "version": "0.0.1",
+  "description": "web based 5-minute walk test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dariosalvi78/5mwt-js.git"
+  },
+  "keywords": [
+    "5mwt",
+    "health"
+  ],
+  "author": "Dario Salvi, Gent Ymeri",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dariosalvi78/5mwt-js/issues"
+  },
+  "homepage": "https://github.com/dariosalvi78/5mwt-js#readme",
+  "dependencies": {
+    "file-saver": "^2.0.5"
+  }
+}
