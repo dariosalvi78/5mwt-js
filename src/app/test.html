@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdn.rawgit.com/kimeiga/bahunya/css/bahunya-0.1.1.css" />
     <script src="deps/FileSaver.js"></script>
+    <script src="phone/motion.js"></script>
 </head>
 
 <body>
@@ -168,11 +169,31 @@
     updateTexts()
     updateButton()
 
+    let testData = {}
+    initData = function () {
+        testData = {
+            run1: {
+                motion: [],
+                orientation: []
+            },
+            run2: {
+                motion: [],
+                orientation: []
+            },
+            run3: {
+                motion: [],
+                orientation: []
+            }
+        }
+    }
+
     startButton.addEventListener('click', () => {
         state.next()
-        console.log('state', state.current)
         updateTexts()
         updateButton()
+        if (state.current == 'wait1') {
+            initData()
+        }
 
         if (state.current == 'wait1' ||
             state.current == 'wait2' ||
@@ -183,17 +204,37 @@
                 mainText.innerHTML = instructions.wait + ` ${secs}`
                 secs--
                 if (secs == 0) {
+                    // test started!
                     clearInterval(timer)
+
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200)
+                    }
                     state.next()
                     updateTexts()
                     updateButton()
                 }
             }, 1000)
+
+            // start acquiring signals
+            motion.startNotifications((data) => {
+                // store data
+                if (state.current == 'wait1' || state.current == 'walk1')
+                    testData.run1.motion.push(data)
+                if (state.current == 'wait2' || state.current == 'walk2')
+                    testData.run2.motion.push(data)
+                if (state.current == 'wait3' || state.current == 'walk3')
+                    testData.run3.motion.push(data)
+            })
+        } else if (state.current == 'walk1' ||
+            state.current == 'walk2' ||
+            state.current == 'walk3') {
+            motion.stopNotifications()
         }
 
         if (state.current == 'completion') {
-            var blob = new Blob(["Hello, world!"], { type: "text/plain;charset=utf-8" })
-            saveAs(blob, "hello world.txt")
+            var blob = new Blob([JSON.stringify(testData)], { type: "text/json;charset=utf-8" })
+            saveAs(blob, "testresults.txt")
         }
     })
 </script>
