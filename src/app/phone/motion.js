@@ -23,9 +23,9 @@ let motion = {
     }
     this.callback(simplifiedEvent)
   },
-  async isAvailable () {
-    if (typeof DeviceMotionEvent !== 'undefined') return Promise.resolve(true)
-    else return Promise.resolve(false)
+  isAvailable () {
+    if (typeof DeviceMotionEvent !== 'undefined') return true
+    else return false
   },
   async requestPermission () {
     if (typeof (DeviceMotionEvent.requestPermission) === 'function') {
@@ -38,7 +38,7 @@ let motion = {
     this.motionHandler = this.motionHandler.bind(this)
     window.addEventListener('devicemotion', this.motionHandler, false)
   },
-  async stopNotifications () {
+  stopNotifications () {
     window.removeEventListener('devicemotion', this.motionHandler)
     this.callback = null
   }
