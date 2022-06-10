@@ -34,3 +34,5 @@ let orientation = {
     this.callback = null
   }
 }
+
+export default orientation 

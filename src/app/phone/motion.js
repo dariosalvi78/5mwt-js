@@ -44,3 +44,4 @@ let motion = {
   }
 }
 
+export default motion 
