@@ -13,25 +13,21 @@ let testData = {}
 // initialization of an empty test data
 let initData = function () {
     testData = {
+        motion: [],
+        orientation: [],
         run1: {
             startTs: '',
             endTs: '',
-            motion: [],
-            orientation: [],
             duration: 0
         },
         run2: {
             startTs: '',
             endTs: '',
-            motion: [],
-            orientation: [],
             duration: 0
         },
         run3: {
             startTs: '',
             endTs: '',
-            motion: [],
-            orientation: [],
             duration: 0
         }
     }
@@ -75,10 +71,10 @@ let testMachine = () => {
         testData.run1.startTs = new Date()
         // start acquiring signals
         motion.startNotifications((data) => {
-            testData.run1.motion.push(data)
+            testData.motion.push(data)
         })
         orientation.startNotifications((data) => {
-            testData.run1.orientation.push(data)
+            testData.orientation.push(data)
         })
 
         mainText.innerHTML = 'Please wait 5s'
@@ -95,8 +91,6 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'walk1') {
         // first round completed
-        motion.stopNotifications()
-        orientation.stopNotifications()
         testData.run1.endTs = new Date()
 
         state = 'intro2'
@@ -109,13 +103,6 @@ let testMachine = () => {
         state = 'wait2'
 
         testData.run2.startTs = new Date()
-        // start acquiring signals
-        motion.startNotifications((data) => {
-            testData.run2.motion.push(data)
-        })
-        orientation.startNotifications((data) => {
-            testData.run2.orientation.push(data)
-        })
 
         mainText.innerHTML = 'Please wait 5s'
         subText.innerHTML = ''
@@ -131,8 +118,6 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'walk2') {
         // second round completed
-        motion.stopNotifications()
-        orientation.stopNotifications()
         testData.run2.endTs = new Date()
 
         state = 'intro3'
@@ -145,13 +130,6 @@ let testMachine = () => {
         state = 'wait3'
 
         testData.run3.startTs = new Date()
-        // start acquiring signals
-        motion.startNotifications((data) => {
-            testData.run3.motion.push(data)
-        })
-        orientation.startNotifications((data) => {
-            testData.run3.orientation.push(data)
-        })
 
         mainText.innerHTML = 'Please wait 5s'
         subText.innerHTML = ''
@@ -167,17 +145,21 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'walk3') {
         // third round completed
+        testData.run3.endTs = new Date()
+
+        // stop signals acquisition
         motion.stopNotifications()
         orientation.stopNotifications()
-        testData.run3.endTs = new Date()
 
         state = 'completion'
 
-        let time1 = testData.run1.endTs.getTime() - testData.run1.startTs.getTime()
-        let time2 = testData.run2.endTs.getTime() - testData.run2.startTs.getTime()
-        let time3 = testData.run3.endTs.getTime() - testData.run3.startTs.getTime()
+        // compute the time
 
-        let avgTime = (time1 + time2 + time3) / 3
+        testData.run1.duration = testData.run1.endTs.getTime() - testData.run1.startTs.getTime()
+        testData.run2.duration = testData.run2.endTs.getTime() - testData.run2.startTs.getTime()
+        testData.run3.duration = testData.run3.endTs.getTime() - testData.run3.startTs.getTime()
+
+        let avgTime = (testData.run1.duration + testData.run2.duration + testData.run3.duration) / 3
 
         mainText.innerHTML = 'Test completed!'
         subText.innerHTML = `Average time: ${(avgTime / 1000).toFixed(0)}s`
@@ -190,10 +172,11 @@ let testMachine = () => {
     }
 }
 
+
+// start the test state machine
 testMachine()
 
 startButton.addEventListener('click', testMachine)
-
 
 
 // detect file saving capability
