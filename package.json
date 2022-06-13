@@ -2,7 +2,6 @@
   "name": "5mwt",
   "version": "0.0.1",
   "description": "web based 5-minute walk test",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,6 +20,7 @@
   },
   "homepage": "https://github.com/dariosalvi78/5mwt-js#readme",
   "dependencies": {
-    "file-saver": "^2.0.5"
+    "file-saver": "^2.0.5",
+    "nodeplotlib": "^1.0.1"
   }
 }
