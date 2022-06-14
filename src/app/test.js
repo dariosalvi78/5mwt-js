@@ -13,21 +13,26 @@ let testData = {}
 // initialization of an empty test data
 let initData = function () {
     testData = {
+        startTs: '',
+        endTs: '',
         motion: [],
         orientation: [],
         run1: {
-            startTs: '',
-            endTs: '',
+            waitStartMs: 0,
+            walkStartMs: 0,
+            completionMs: 0,
             duration: 0
         },
         run2: {
-            startTs: '',
-            endTs: '',
+            waitStartMs: 0,
+            walkStartMs: 0,
+            completionMs: 0,
             duration: 0
         },
         run3: {
-            startTs: '',
-            endTs: '',
+            waitStartMs: 0,
+            walkStartMs: 0,
+            completionMs: 0,
             duration: 0
         }
     }
@@ -68,7 +73,7 @@ let testMachine = () => {
     } else if (state == 'intro1') {
         state = 'wait1'
 
-        testData.run1.startTs = new Date()
+        testData.startTs = new Date()
         // start acquiring signals
         motion.startNotifications((data) => {
             testData.motion.push(data)
@@ -76,6 +81,7 @@ let testMachine = () => {
         orientation.startNotifications((data) => {
             testData.orientation.push(data)
         })
+        testData.run1.waitStartMs = Date.now() - testData.startTs.getTime()
 
         mainText.innerHTML = 'Please wait 5s'
         subText.innerHTML = ''
@@ -84,6 +90,7 @@ let testMachine = () => {
         startCountdown()
     } else if (state == 'wait1') {
         state = 'walk1'
+        testData.run1.walkStartMs = Date.now() - testData.startTs.getTime()
 
         mainText.innerHTML = 'Walk!'
         subText.innerHTML = 'Press "Done" when completed'
@@ -91,7 +98,7 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'walk1') {
         // first round completed
-        testData.run1.endTs = new Date()
+        testData.run1.completionMs = Date.now() - testData.startTs.getTime()
 
         state = 'intro2'
 
@@ -102,7 +109,7 @@ let testMachine = () => {
     } else if (state == 'intro2') {
         state = 'wait2'
 
-        testData.run2.startTs = new Date()
+        testData.run2.waitStartMs = Date.now() - testData.startTs.getTime()
 
         mainText.innerHTML = 'Please wait 5s'
         subText.innerHTML = ''
@@ -111,6 +118,7 @@ let testMachine = () => {
         startCountdown()
     } else if (state == 'wait2') {
         state = 'walk2'
+        testData.run2.walkStartMs = Date.now() - testData.startTs.getTime()
 
         mainText.innerHTML = 'Walk!'
         subText.innerHTML = 'Press "Done" when completed'
@@ -118,7 +126,7 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'walk2') {
         // second round completed
-        testData.run2.endTs = new Date()
+        testData.run2.completionMs = Date.now() - testData.startTs.getTime()
 
         state = 'intro3'
 
@@ -128,8 +136,7 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'intro3') {
         state = 'wait3'
-
-        testData.run3.startTs = new Date()
+        testData.run3.waitStartMs = Date.now() - testData.startTs.getTime()
 
         mainText.innerHTML = 'Please wait 5s'
         subText.innerHTML = ''
@@ -138,6 +145,7 @@ let testMachine = () => {
         startCountdown()
     } else if (state == 'wait3') {
         state = 'walk3'
+        testData.run3.walkStartMs = Date.now() - testData.startTs.getTime()
 
         mainText.innerHTML = 'Walk!'
         subText.innerHTML = 'Press "Done" when completed'
@@ -145,19 +153,21 @@ let testMachine = () => {
         startButton.disabled = false
     } else if (state == 'walk3') {
         // third round completed
-        testData.run3.endTs = new Date()
+        testData.run3.completionMs = Date.now() - testData.startTs.getTime()
 
         // stop signals acquisition
         motion.stopNotifications()
         orientation.stopNotifications()
 
+        testData.endTs = new Date()
+
         state = 'completion'
 
         // compute the time
 
-        testData.run1.duration = testData.run1.endTs.getTime() - testData.run1.startTs.getTime()
-        testData.run2.duration = testData.run2.endTs.getTime() - testData.run2.startTs.getTime()
-        testData.run3.duration = testData.run3.endTs.getTime() - testData.run3.startTs.getTime()
+        testData.run1.duration = testData.run1.completionMS - testData.run1.walkStartMs
+        testData.run2.duration = testData.run2.completionMS - testData.run2.walkStartMs
+        testData.run3.duration = testData.run3.completionMS - testData.run3.walkStartMs
 
         let avgTime = (testData.run1.duration + testData.run2.duration + testData.run3.duration) / 3
 
