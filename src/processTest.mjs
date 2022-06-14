@@ -1,7 +1,8 @@
 import { readFile } from 'fs/promises'
 import plotly from 'nodeplotlib'
+import { WindowedRollingStats } from './app/algos/stats.mjs'
 
-const FILE = './data/testresults1.json'
+const FILE = './data/testresults2.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
@@ -98,10 +99,63 @@ plotly.plot([
         getLineShape(testData.run3.walkStartMs, 'walk 3', 0, 360),
         getLineShape(testData.run3.completionMs, 'end 3', 0, 360),
     ]
-}, {
-    showEditInChartStudio: true,
-    plotlyServerURL: "https://chart-studio.plotly.com"
 })
 
+let avgSamplPeriod = 0
+for (let i = 1; i < testData.motion.length; i++) {
+    avgSamplPeriod += testData.motion[i].msFromStart - testData.motion[i - 1].msFromStart
+}
+avgSamplPeriod /= testData.motion.length
+
+console.log('Sampling period', avgSamplPeriod)
+
+// half second of samples
+let statsWindow = Math.round(500 / avgSamplPeriod)
+let stats = new WindowedRollingStats(statsWindow)
+
+let accMod = []
+let accVariance = []
+let maxVariance = 0
+for (let i = 0; i < testData.motion.length; i++) {
+    let mod = Math.sqrt((testData.motion[i].acc.x ** 2) + (testData.motion[i].acc.y ** 2) + (testData.motion[i].acc.z ** 2))
+    accMod.push({
+        msFromStart: testData.motion[i].msFromStart,
+        mod: mod
+    })
+    stats.addValue(mod)
+    let variance = stats.getVariance()
+    if (variance > maxVariance) maxVariance = variance
+    accVariance.push({
+        msFromStart: testData.motion[i].msFromStart,
+        var: variance
+    })
+}
 
 
+// plot the variance
+plotly.plot([
+    {
+        x: accVariance.map((m) => m.msFromStart),
+        y: accVariance.map((m) => m.var),
+        type: 'scatter',
+        name: "variance"
+    }
+], {
+    title: 'Variance',
+    xaxis: {
+        autorange: true
+    },
+    shapes: [
+        getLineShape(testData.run1.waitStartMs, 'wait 1', 0, maxVariance),
+        getLineShape(testData.run1.walkStartMs, 'walk 1', 0, maxVariance),
+        getLineShape(testData.run1.completionMs, 'end 1', 0, maxVariance),
+
+        getLineShape(testData.run2.waitStartMs, 'wait 2', 0, maxVariance),
+        getLineShape(testData.run2.walkStartMs, 'walk 2', 0, maxVariance),
+        getLineShape(testData.run2.completionMs, 'end 2', 0, maxVariance),
+
+        getLineShape(testData.run3.waitStartMs, 'wait 3', 0, maxVariance),
+        getLineShape(testData.run3.walkStartMs, 'walk 3', 0, maxVariance),
+        getLineShape(testData.run3.completionMs, 'end 3', 0, maxVariance),
+    ]
+})
