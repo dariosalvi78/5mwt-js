@@ -3,7 +3,7 @@
 
 ## Run
 
-
+Call `npm run`
 
 
 ## Acknowledgments
