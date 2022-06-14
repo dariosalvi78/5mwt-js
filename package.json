@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "web based 5-minute walk test",
   "scripts": {
+    "start": "npx http-server ./src/app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
