@@ -165,9 +165,9 @@ let testMachine = () => {
 
         // compute the time
 
-        testData.run1.duration = testData.run1.completionMS - testData.run1.walkStartMs
-        testData.run2.duration = testData.run2.completionMS - testData.run2.walkStartMs
-        testData.run3.duration = testData.run3.completionMS - testData.run3.walkStartMs
+        testData.run1.duration = testData.run1.completionMs - testData.run1.walkStartMs
+        testData.run2.duration = testData.run2.completionMs - testData.run2.walkStartMs
+        testData.run3.duration = testData.run3.completionMs - testData.run3.walkStartMs
 
         let avgTime = (testData.run1.duration + testData.run2.duration + testData.run3.duration) / 3
 
