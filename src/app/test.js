@@ -2,11 +2,15 @@ import motion from './phone/motion.js'
 import orientation from './phone/orientation.js'
 
 let startButton = document.getElementById('startBtn')
+let permButton = document.getElementById('permBtn')
 let mainText = document.getElementById('mainText')
 let subText = document.getElementById('subText')
 
 // current state of the test
 let state = 'completion'
+
+permButton.visibility = 'hidden'
+permButton.disabled = true
 
 // object containing the data of the test
 let testData = {}
@@ -189,6 +193,8 @@ testMachine()
 startButton.addEventListener('click', testMachine)
 
 
+permButton.addEventListener('click', grantPermission)
+
 // detect file saving capability
 try {
     new Blob
@@ -208,16 +214,6 @@ if (!motion.isAvailable()) {
     startButton.disabled = true
 }
 
-try {
-    await motion.requestPermission()
-} catch (err) {
-    console.error(err)
-    state = 'error'
-    subText.innerHTML = 'Motion sensor not given permission'
-    startButton.style.visibility = 'hidden'
-    startButton.disabled = true
-}
-
 // detect orientation availability
 if (!orientation.isAvailable()) {
     state.current = 'error'
@@ -226,12 +222,34 @@ if (!orientation.isAvailable()) {
     startButton.disabled = true
 }
 
-try {
-    await orientation.requestPermission()
-} catch (err) {
-    console.error(err)
-    state.current = 'error'
-    subText.innerHTML = 'Orientation sensor not given permission'
-    startButton.style.visibility = 'hidden'
-    startButton.disabled = true
+function grantPermission () {
+    try {
+        await motion.requestPermission()
+        permButton.visibility = 'hidden'
+        permButton.disabled = true
+    } catch (err) {
+        console.error(err)
+        state = 'error'
+        subText.innerHTML = 'Motion sensor not given permission'
+        startButton.style.visibility = 'hidden'
+        startButton.disabled = true
+
+        permButton.visibility = 'visible'
+        permButton.disabled = false
+    }
+
+    try {
+        await orientation.requestPermission()
+        permButton.visibility = 'hidden'
+        permButton.disabled = true
+    } catch (err) {
+        console.error(err)
+        state.current = 'error'
+        subText.innerHTML = 'Orientation sensor not given permission'
+        startButton.style.visibility = 'hidden'
+        startButton.disabled = true
+
+        permButton.visibility = 'visible'
+        permButton.disabled = false
+    }
 }
