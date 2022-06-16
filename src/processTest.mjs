@@ -3,7 +3,7 @@ import plotly from 'nodeplotlib'
 import { WindowedRollingStats } from './app/algos/stats.mjs'
 import { minAngleDiff } from './app/algos/orientation.mjs'
 
-const FILE = './data/testresults2.json'
+const FILE = './data/testresults1.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
@@ -117,6 +117,7 @@ let accMeanStd = []
 
 let rotRateMod = []
 let rotMean = []
+
 for (let i = 0; i < testData.motion.length; i++) {
     let accmod = Math.sqrt((testData.motion[i].acc.x ** 2) + (testData.motion[i].acc.y ** 2) + (testData.motion[i].acc.z ** 2))
     accMod.push({
