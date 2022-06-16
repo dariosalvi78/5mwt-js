@@ -46,6 +46,9 @@ let initData = function () {
 // the state machine of the test is implemented in the callback of the button
 let testMachine = () => {
 
+    permButton.style.visibility = 'hidden'
+    permButton.disabled = true
+
     let startCountdown = function () {
         // countdown
         let secs = 4
@@ -187,12 +190,6 @@ let testMachine = () => {
 }
 
 
-// start the test state machine
-testMachine()
-
-startButton.addEventListener('click', testMachine)
-
-
 // detect file saving capability
 try {
     new Blob
@@ -223,8 +220,8 @@ if (!orientation.isAvailable()) {
 let grantPermission = async () => {
     try {
         await motion.requestPermission()
-        permButton.style.visibility = 'hidden'
-        permButton.disabled = true
+        state.current = 'intro1'
+        testMachine()
     } catch (err) {
         console.error(err)
         state = 'error'
@@ -238,8 +235,8 @@ let grantPermission = async () => {
 
     try {
         await orientation.requestPermission()
-        permButton.style.visibility = 'hidden'
-        permButton.disabled = true
+        state.current = 'intro1'
+        testMachine()
     } catch (err) {
         console.error(err)
         state.current = 'error'
@@ -255,3 +252,8 @@ let grantPermission = async () => {
 permButton.addEventListener('click', grantPermission)
 
 grantPermission()
+
+// start the test state machine
+testMachine()
+
+startButton.addEventListener('click', testMachine)
