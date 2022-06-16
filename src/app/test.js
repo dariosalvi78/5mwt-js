@@ -9,7 +9,7 @@ let subText = document.getElementById('subText')
 // current state of the test
 let state = 'completion'
 
-permButton.visibility = 'hidden'
+permButton.style.visibility = 'hidden'
 permButton.disabled = true
 
 // object containing the data of the test
@@ -220,10 +220,10 @@ if (!orientation.isAvailable()) {
     startButton.disabled = true
 }
 
-let grantPermission = () => {
+let grantPermission = async () => {
     try {
         await motion.requestPermission()
-        permButton.visibility = 'hidden'
+        permButton.style.visibility = 'hidden'
         permButton.disabled = true
     } catch (err) {
         console.error(err)
@@ -232,13 +232,13 @@ let grantPermission = () => {
         startButton.style.visibility = 'hidden'
         startButton.disabled = true
 
-        permButton.visibility = 'visible'
+        permButton.style.visibility = 'visible'
         permButton.disabled = false
     }
 
     try {
         await orientation.requestPermission()
-        permButton.visibility = 'hidden'
+        permButton.style.visibility = 'hidden'
         permButton.disabled = true
     } catch (err) {
         console.error(err)
@@ -247,7 +247,7 @@ let grantPermission = () => {
         startButton.style.visibility = 'hidden'
         startButton.disabled = true
 
-        permButton.visibility = 'visible'
+        permButton.style.visibility = 'visible'
         permButton.disabled = false
     }
 }
