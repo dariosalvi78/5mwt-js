@@ -193,8 +193,6 @@ testMachine()
 startButton.addEventListener('click', testMachine)
 
 
-permButton.addEventListener('click', grantPermission)
-
 // detect file saving capability
 try {
     new Blob
@@ -222,7 +220,7 @@ if (!orientation.isAvailable()) {
     startButton.disabled = true
 }
 
-function grantPermission () {
+let grantPermission = () => {
     try {
         await motion.requestPermission()
         permButton.visibility = 'hidden'
@@ -253,3 +251,7 @@ function grantPermission () {
         permButton.disabled = false
     }
 }
+
+permButton.addEventListener('click', grantPermission)
+
+grantPermission()
