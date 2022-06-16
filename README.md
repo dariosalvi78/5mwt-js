@@ -3,7 +3,8 @@
 
 ## Run
 
-Call `npm run`
+Call `npm run start` will start a web server with the app served locally on port 3000.
+
 
 
 ## Acknowledgments
