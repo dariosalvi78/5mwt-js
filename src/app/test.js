@@ -211,7 +211,7 @@ if (!motion.isAvailable()) {
 
 // detect orientation availability
 if (!orientation.isAvailable()) {
-    state.current = 'error'
+    state = 'error'
     subText.innerHTML = 'Orientation sensor not available'
     startButton.style.visibility = 'hidden'
     startButton.disabled = true
@@ -220,7 +220,7 @@ if (!orientation.isAvailable()) {
 let grantPermission = async () => {
     try {
         await motion.requestPermission()
-        state.current = 'intro1'
+        state = 'completion'
         testMachine()
     } catch (err) {
         console.error(err)
@@ -235,11 +235,12 @@ let grantPermission = async () => {
 
     try {
         await orientation.requestPermission()
-        state.current = 'intro1'
+        state = 'completion'
         testMachine()
+
     } catch (err) {
         console.error(err)
-        state.current = 'error'
+        state = 'error'
         subText.innerHTML = 'Orientation sensor not given permission'
         startButton.style.visibility = 'hidden'
         startButton.disabled = true
