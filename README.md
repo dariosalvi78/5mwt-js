@@ -11,7 +11,7 @@ Prerequisites:
 Call `npm run start` will start a web server with the app served locally on port 3000.
 
 ### Run the data analysis
-Open the file under `src/processTest.mjs` and change the filename in the FILE variable (line 6). Run `node ./src/processTest.mjs` to start the script.
+Open the file under `src/processTest.mjs` and change the filename in the FILE variable (line 6). Run `node ./src/seeTest.mjs` to start the script.
 The script will open a tab on your browser where you can see the charts related to the file you have selected.
 
 ## Data marking
