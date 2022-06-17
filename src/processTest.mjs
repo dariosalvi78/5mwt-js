@@ -3,7 +3,7 @@ import plotly from 'nodeplotlib'
 import { WindowedRollingStats } from './app/algos/stats.mjs'
 import { minAngleDiff } from './app/algos/orientation.mjs'
 
-const FILE = './data/testresults1.json'
+const FILE = './data/user1/normal/testresults_11.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
@@ -93,7 +93,7 @@ let plotSignals = function (title, data, valNames) {
 
 plotSignals('Acceleration (no g)', testData.motion, ['acc.x', 'acc.y', 'acc.z'])
 plotSignals('Rotation rate', testData.motion, ['rotRate.alpha', 'rotRate.beta', 'rotRate.gamma'])
-plotSignals('Orientation', testData.orientation, ['alpha', 'beta', 'gamma'])
+// plotSignals('Orientation', testData.orientation, ['alpha', 'beta', 'gamma'])
 
 
 
@@ -165,8 +165,8 @@ plotSignals('Rotation rate module', rotRateMod, ['mod'])
 
 
 // plot the stats
-plotSignals('Mean of acc mod', accMean, ['mean'])
+// plotSignals('Mean of acc mod', accMean, ['mean'])
 // plotSignals('SD of acc mod', accStd, ['std'])
 // plotSignals('Mean + SD of acc mod', accMeanStd, ['meanStd'])
-plotSignals('Mean of rot rate mod', rotMean, ['mean'])
+// plotSignals('Mean of rot rate mod', rotMean, ['mean'])
 
