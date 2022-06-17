@@ -1,5 +1,6 @@
 Gent
 Age: 
+Sex: M
 Height: 
 Phone:
-OS: 
+OS: iOS

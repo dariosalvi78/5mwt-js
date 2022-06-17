@@ -1,1 +1,3 @@
-filename, walkstart1, walkend1, turnstart1, turnend1, walkstart2, walkend2, turnstart2, turnend2, walkstart3, walkend3
+filename,walkstart1,walkend1,turnstart1,turnend1,walkstart2,walkend2,turnstart2,turnend2,walkstart3,walkend3
+testresults_11.json,4341,10124,11700,13800,18950,24240,25700,27500,32600,37600
+testresults_12.json,4267,9660,10400,12300,17550,22600,23750,26100,32100,37300

@@ -106,7 +106,8 @@ avgSamplPeriod /= testData.motion.length
 console.log('Sampling period', avgSamplPeriod)
 
 // 1 second of samples
-let statsWindow = Math.round(1000 / avgSamplPeriod)
+let windowSizeMs = 1000
+let statsWindow = Math.round(windowSizeMs / avgSamplPeriod)
 let accStats = new WindowedRollingStats(statsWindow)
 let rotStats = new WindowedRollingStats(statsWindow)
 
@@ -170,3 +171,4 @@ plotSignals('Rotation rate module', rotRateMod, ['mod'])
 // plotSignals('Mean + SD of acc mod', accMeanStd, ['meanStd'])
 // plotSignals('Mean of rot rate mod', rotMean, ['mean'])
 
+plotSignals('Orientation', testData.orientation, ['alpha', 'beta', 'gamma'])

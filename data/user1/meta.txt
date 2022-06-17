@@ -1,5 +1,6 @@
 Dario
 Age: 43
+Sex: M
 Height: 178
 Phone: OnePlus 5
 OS: Android

@@ -22,7 +22,7 @@ To manually the times when each phase of the test starts/end, in each folder ins
 - filename: the filename you are analysing. You can rename it if you prefer.
 - walkstart1: millisecond of when the first walking activity starts (check the acceleration module)
 - walkend1: ms of when the first walking activity ends (exclude the two peaks around the tap of the button)
-- turnstart1: ms of when the first turn around activity starts (check the rotation rate module)
+- turnstart1: ms of when the first turn around activity starts (check the rotation rate module and the orientation charts)
 - turnend1: ms of when the first turn around activity ends
 - walkstart2: ms of when the second walking activity starts
 - walkend2: ms of when the second walking activity ends
