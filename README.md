@@ -1,6 +1,11 @@
 # 5mwt-js
 5-meter walk test web application
 
+The 5-meter walk test is a simple exercise test [^1] for measuring outcomes in surgery.
+
+
+[^1]: [Society of Thoracic Surgeons Protocol for 5-Meter Walk Test]jj(https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3751713/#B23)
+
 ## Run
 
 Prerequisites:
