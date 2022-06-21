@@ -4,12 +4,12 @@
 The 5-meter walk test is a simple exercise test [^1] for measuring outcomes in surgery.
 
 
-[^1]: [Society of Thoracic Surgeons Protocol for 5-Meter Walk Test]jj(https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3751713/#B23)
+[^1]: [Society of Thoracic Surgeons Protocol for 5-Meter Walk Test](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3751713/#B23)
 
 ## Run
 
 Prerequisites:
-- install nodejs
+- install nodejs (latest LTS version)
 - run `npm i` in the root folder of this project
 
 ### Run the app
@@ -20,9 +20,9 @@ Open the file under `src/processTest.mjs` and change the filename in the FILE va
 The script will open a tab on your browser where you can see the charts related to the file you have selected.
 
 ## Data marking
-Fill in the file inside meta.txt with your details.
+1. Fill in the file inside meta.txt with your details.
 
-To manually the times when each phase of the test starts/end, in each folder inside `data/userX`, open the csv file (you can open it with Excel), start the data plotting script and identify the following:
+2. To manually the times when each phase of the test starts/end, in each folder inside `data/userX`, open the csv file (you can open it with Excel), start the data plotting script and identify the following:
 
 - filename: the filename you are analysing. You can rename it if you prefer.
 - walkstart1: millisecond of when the first walking activity starts (check the acceleration module)
@@ -36,7 +36,7 @@ To manually the times when each phase of the test starts/end, in each folder ins
 - walkstart3: ms of when the third walking activity starts
 - walkend3: ms of when the third walking activity ends
 
-Don't forget to commit + push your changes!
+3. Don't forget to commit + push your changes!
 
 
 ## Acknowledgments

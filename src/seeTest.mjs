@@ -1,8 +1,7 @@
 import { readFile } from 'fs/promises'
 import plotly from 'nodeplotlib'
-import { WindowedRollingStats } from './app/algos/stats.mjs'
 
-const FILE = './data/user1/normal/testresults_12.json'
+const FILE = './data/user1/normal/testresults_15.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
