@@ -2,15 +2,11 @@ import motion from './phone/motion.js'
 import orientation from './phone/orientation.js'
 
 let startButton = document.getElementById('startBtn')
-let permButton = document.getElementById('permBtn')
 let mainText = document.getElementById('mainText')
 let subText = document.getElementById('subText')
 
 // current state of the test
-let state = 'completion'
-
-permButton.style.visibility = 'hidden'
-permButton.disabled = true
+let state = 'init'
 
 // object containing the data of the test
 let testData = {}
@@ -44,11 +40,7 @@ let initData = function () {
 
 
 // the state machine of the test is implemented in the callback of the button
-let testMachine = () => {
-
-    permButton.style.visibility = 'hidden'
-    permButton.disabled = true
-
+let testMachine = async () => {
     let startCountdown = function () {
         // countdown
         let secs = 4
@@ -68,7 +60,36 @@ let testMachine = () => {
         }, 1000)
     }
 
-    if (state == 'completion') {
+    if (state == 'init') {
+
+        try {
+            await motion.requestPermission()
+            state = 'completion'
+            testMachine()
+        } catch (err) {
+            console.error(err)
+            state = 'init'
+            subText.innerHTML = 'Motion sensor needs permission'
+            startButton.innerHTML = 'Grant permission'
+            startButton.style.visibility = 'visible'
+            startButton.disabled = false
+        }
+
+        try {
+            await orientation.requestPermission()
+            state = 'completion'
+            testMachine()
+
+        } catch (err) {
+            console.error(err)
+            state = 'init'
+            subText.innerHTML = 'Orientation sensor needs permission'
+            startButton.innerHTML = 'Grant permission'
+            startButton.style.visibility = 'visible'
+            startButton.disabled = false
+        }
+
+    } else if (state == 'completion') {
         state = 'intro1'
 
         initData()
@@ -217,42 +238,6 @@ if (!orientation.isAvailable()) {
     startButton.disabled = true
 }
 
-let grantPermission = async () => {
-    try {
-        await motion.requestPermission()
-        state = 'completion'
-        testMachine()
-    } catch (err) {
-        console.error(err)
-        state = 'error'
-        subText.innerHTML = 'Motion sensor not given permission'
-        startButton.style.visibility = 'hidden'
-        startButton.disabled = true
-
-        permButton.style.visibility = 'visible'
-        permButton.disabled = false
-    }
-
-    try {
-        await orientation.requestPermission()
-        state = 'completion'
-        testMachine()
-
-    } catch (err) {
-        console.error(err)
-        state = 'error'
-        subText.innerHTML = 'Orientation sensor not given permission'
-        startButton.style.visibility = 'hidden'
-        startButton.disabled = true
-
-        permButton.style.visibility = 'visible'
-        permButton.disabled = false
-    }
-}
-
-permButton.addEventListener('click', grantPermission)
-
-grantPermission()
 
 // start the test state machine
 testMachine()
