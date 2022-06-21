@@ -3,7 +3,7 @@ import plotly from 'nodeplotlib'
 import { WindowedRollingStats } from './app/algos/stats.mjs'
 import { minAngleDiff } from './app/algos/orientation.mjs'
 
-const FILE = './data/user1/normal/testresults_11.json'
+const FILE = './data/user1/normal/testresults_13.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
@@ -277,15 +277,29 @@ for (let i = 0; i < accMean.length; i++) {
         if (walk1StartMs == 0 && accMean[i].mean > walkAccThre) walk1StartMs = timestamp
         if (walk1StartMs != 0 && accMean[i].mean < walkAccThre) walk1StopMs = timestamp
     }
+    if (timestamp >= testData.run1.completionMs && walk1StopMs == 0) {
+        // no stop has been identified, use the manual marker
+        walk1StopMs = timestamp
+    }
+
     if (timestamp >= testData.run2.walkStartMs && timestamp < testData.run2.completionMs) {
         // here we expect the walk to start and stop
         if (walk2StartMs == 0 && accMean[i].mean > walkAccThre) walk2StartMs = timestamp
         if (walk2StartMs != 0 && accMean[i].mean < walkAccThre) walk2StopMs = timestamp
     }
+    if (timestamp >= testData.run2.completionMs && walk2StopMs == 0) {
+        // no stop has been identified, use the manual marker
+        walk2StopMs = timestamp
+    }
+
     if (timestamp >= testData.run3.walkStartMs && timestamp < testData.run3.completionMs) {
         // here we expect the walk to start and stop
         if (walk3StartMs == 0 && accMean[i].mean > walkAccThre) walk3StartMs = timestamp
         if (walk3StartMs != 0 && accMean[i].mean < walkAccThre) walk3StopMs = timestamp
+    }
+    if (timestamp >= testData.run3.completionMs && walk3StopMs == 0) {
+        // no stop has been identified, use the manual marker
+        walk3StopMs = timestamp
     }
 
     if (timestamp >= testData.run1.completionMs && timestamp < testData.run2.waitStartMs) {
