@@ -16,10 +16,12 @@ Prerequisites:
 Call `npm run start` will start a web server with the app served locally on port 3000.
 
 ### Run the data analysis
-Open the file under `src/processTest.mjs` and change the filename in the FILE variable (line 6). Run `node ./src/seeTest.mjs` to start the script.
-The script will open a tab on your browser where you can see the charts related to the file you have selected.
+Run `node src/seeTest.mjs` to only plot the signals on a web interface.
+Run `node src/processTest.mjs` to run the algorithm for a specific signal.
 
 ## Data marking
+Run `node ./src/seeTest.mjs` to see the signals. Change the filename in the source of the script.
+
 1. Fill in the file inside meta.txt with your details.
 
 2. To manually the times when each phase of the test starts/end, in each folder inside `data/userX`, open the csv file (you can open it with Excel), start the data plotting script and identify the following:
@@ -37,6 +39,12 @@ The script will open a tab on your browser where you can see the charts related 
 - walkend3: ms of when the third walking activity ends
 
 3. Don't forget to commit + push your changes!
+
+# Develop
+
+- `src/stats.mjs` contains the implementation of simple statistics
+- `src/playground.mjs` contains code where to test different ideas
+- `src/processTest.mjs` is used to run the algorithm for a specific test
 
 
 ## Acknowledgments

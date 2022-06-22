@@ -1,9 +1,8 @@
 import { readFile } from 'fs/promises'
 import plotly from 'nodeplotlib'
-import { WindowedRollingStats } from './app/algos/stats.mjs'
-import { minAngleDiff } from './app/algos/orientation.mjs'
+import MovingAvgSegmenter from './app/algos/MovingAvgSegmenter.mjs'
 
-const FILE = './data/user1/normal/testresults_13.json'
+const FILE = './data/user1/normal/testresults_11.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
@@ -13,7 +12,7 @@ const REFFILE = FILE.substring(0, FILE.lastIndexOf('/')) + '/reference.csv'
 let refFile = await readFile(REFFILE, 'utf8')
 
 
-const DOPLOT = true
+const DOPLOT = false
 
 // utility functions
 Object.byString = function (o, s) {
@@ -133,201 +132,58 @@ plotSignals('Orientation', testData.orientation, ['alpha', 'beta', 'gamma'])
 
 let reference = getReferece()
 
-console.log('Walk 1 duration', reference.run1.walkEnd - reference.run1.walkStart)
-console.log('Walk 2 duration', reference.run2.walkEnd - reference.run2.walkStart)
-console.log('Walk 3 duration', reference.run3.walkEnd - reference.run3.walkStart)
-
-let avgSamplPeriod = 0
-for (let i = 1; i < testData.motion.length; i++) {
-    avgSamplPeriod += testData.motion[i].msFromStart - testData.motion[i - 1].msFromStart
-}
-avgSamplPeriod /= testData.motion.length
-
-console.log('Sampling period', avgSamplPeriod)
-
-// 1 second of samples
-let windowSizeMs = 1000
-let statsWindow = Math.round(windowSizeMs / avgSamplPeriod)
-let accStats = new WindowedRollingStats(statsWindow)
-let rotStats = new WindowedRollingStats(statsWindow)
-
-let accMod = []
-let accStd = []
-let accMean = []
-
-let rotRateMod = []
-let rotMean = []
-
-let waitN = 0
-let waitAccMean = 0
-let waitRotMean = 0
-let walkN = 0
-let walkAccMean = 0
-let walkRotMean = 0
-let turnN = 0
-let turnRotAvg = 0
-
+let state = 'completion'
 for (let i = 0; i < testData.motion.length; i++) {
-    let accmod = Math.sqrt((testData.motion[i].acc.x ** 2) + (testData.motion[i].acc.y ** 2) + (testData.motion[i].acc.z ** 2))
-    accMod.push({
-        msFromStart: testData.motion[i].msFromStart,
-        mod: accmod
-    })
+    let ts = testData.motion[i].msFromStart
 
-    accStats.addValue(accmod)
-
-    let std = Math.sqrt(accStats.getVariance())
-    accStd.push({
-        msFromStart: testData.motion[i].msFromStart,
-        std: std
-    })
-
-    let meanAcc = accStats.getMean()
-    accMean.push({
-        msFromStart: testData.motion[i].msFromStart,
-        mean: meanAcc
-    })
-
-    let rotmod = Math.sqrt((testData.motion[i].rotRate.alpha ** 2) + (testData.motion[i].rotRate.beta ** 2) + (testData.motion[i].rotRate.gamma ** 2))
-
-    rotRateMod.push({
-        msFromStart: testData.motion[i].msFromStart,
-        mod: rotmod
-    })
-    rotStats.addValue(rotmod)
-
-    let meanRot = rotStats.getMean()
-    rotMean.push({
-        msFromStart: testData.motion[i].msFromStart,
-        mean: meanRot
-    })
-
-
-    if ((testData.motion[i].msFromStart >= testData.run1.waitStartMs && testData.motion[i].msFromStart < testData.run1.walkStartMs) ||
-        (testData.motion[i].msFromStart >= testData.run2.waitStartMs && testData.motion[i].msFromStart < testData.run2.walkStartMs) ||
-        (testData.motion[i].msFromStart >= testData.run3.waitStartMs && testData.motion[i].msFromStart < testData.run3.walkStartMs)) {
-        waitAccMean += meanAcc
-        waitRotMean += meanRot
-        waitN++
+    if (ts >= testData.run1.waitStartMs && state === 'completion') {
+        state = 'wait1'
+        MovingAvgSegmenter.setEvent(state, testData.run1.waitStartMs)
+    } else if (ts >= testData.run1.walkStartMs && state === 'wait1') {
+        state = 'walk1'
+        MovingAvgSegmenter.setEvent(state, testData.run1.walkStartMs)
+    } else if (ts >= testData.run1.completionMs && state === 'walk1') {
+        state = 'intro2'
+        MovingAvgSegmenter.setEvent(state, testData.run1.completionMs)
+    } else if (ts >= testData.run2.waitStartMs && state === 'intro2') {
+        state = 'wait2'
+        MovingAvgSegmenter.setEvent(state, testData.run2.waitStartMs)
+    } else if (ts >= testData.run2.walkStartMs && state === 'wait2') {
+        state = 'walk2'
+        MovingAvgSegmenter.setEvent(state, testData.run2.walkStartMs)
+    } else if (ts >= testData.run2.completionMs && state === 'walk2') {
+        state = 'intro3'
+        MovingAvgSegmenter.setEvent(state, testData.run2.completionMs)
+    } else if (ts >= testData.run3.waitStartMs && state === 'intro3') {
+        state = 'wait3'
+        MovingAvgSegmenter.setEvent(state, testData.run3.waitStartMs)
+    } else if (ts >= testData.run3.walkStartMs && state === 'wait3') {
+        state = 'walk3'
+        MovingAvgSegmenter.setEvent(state, testData.run3.walkStartMs)
+    } else if (ts >= testData.run3.completionMs && state === 'walk3') {
+        state = 'completion'
+        MovingAvgSegmenter.setEvent(state, testData.run3.completionMs)
     }
-
-    if ((testData.motion[i].msFromStart >= testData.run1.walkStartMs && testData.motion[i].msFromStart < testData.run1.completionMs) ||
-        (testData.motion[i].msFromStart >= testData.run2.walkStartMs && testData.motion[i].msFromStart < testData.run2.completionMs) ||
-        (testData.motion[i].msFromStart >= testData.run3.walkStartMs && testData.motion[i].msFromStart < testData.run3.completionMs)) {
-        walkAccMean += meanAcc
-        walkRotMean += meanRot
-        walkN++
-    }
-
-    if ((testData.motion[i].msFromStart >= testData.run1.completionMs && testData.motion[i].msFromStart < testData.run2.waitStartMs) ||
-        (testData.motion[i].msFromStart >= testData.run2.completionMs && testData.motion[i].msFromStart < testData.run3.waitStartMs)) {
-        turnRotAvg += meanRot
-        turnN++
-    }
+    MovingAvgSegmenter.addMotion(testData.motion[i])
 }
 
-waitAccMean /= waitN
-walkAccMean /= walkN
-waitRotMean /= waitN
-walkRotMean /= walkN
-turnRotAvg /= turnN
-
-console.log('Mean of acc mod during WAIT', waitAccMean)
-console.log('Mean of acc mod during WALK', walkAccMean)
-
-console.log('Mean of rot mod during WAIT', waitRotMean)
-console.log('Mean of rot mod during WALK', walkRotMean)
-
-console.log('Mean of rot mod during TURN', turnRotAvg)
-
-
-// plot the modules
-plotSignals('Acceleration module', accMod, ['mod'])
-plotSignals('Rotation rate module', rotRateMod, ['mod'])
-
-
-// plot the stats
-plotSignals('Mean of acc mod', accMean, ['mean'])
-// plotSignals('SD of acc mod', accStd, ['std'])
-plotSignals('Mean of rot rate mod', rotMean, ['mean'])
-
-
-// do a simple detection based on thresholds
-
-let walkAccThre = waitAccMean + ((walkAccMean + waitAccMean) / 3)
-let turnRotThre = waitRotMean + ((turnRotAvg + waitRotMean) / 3)
-
-console.log('Walk acc threshold', walkAccThre)
-console.log('Turn rot threshold', turnRotThre)
-
-let walk1StartMs = 0
-let walk1StopMs = 0
-let walk2StartMs = 0
-let walk2StopMs = 0
-let walk3StartMs = 0
-let walk3StopMs = 0
-let turn1StartMs = 0
-let turn1StopMs = 0
-let turn2StartMs = 0
-let turn2StopMs = 0
-for (let i = 0; i < accMean.length; i++) {
-    let timestamp = accMean[i].msFromStart - (windowSizeMs / 2) // compensate for filtering
-    if (timestamp >= testData.run1.walkStartMs && timestamp < testData.run1.completionMs) {
-        // here we expect the walk to start and stop
-        if (walk1StartMs == 0 && accMean[i].mean > walkAccThre) walk1StartMs = timestamp
-        if (walk1StartMs != 0 && accMean[i].mean < walkAccThre) walk1StopMs = timestamp
-    }
-    if (timestamp >= testData.run1.completionMs && walk1StopMs == 0) {
-        // no stop has been identified, use the manual marker
-        walk1StopMs = timestamp
-    }
-
-    if (timestamp >= testData.run2.walkStartMs && timestamp < testData.run2.completionMs) {
-        // here we expect the walk to start and stop
-        if (walk2StartMs == 0 && accMean[i].mean > walkAccThre) walk2StartMs = timestamp
-        if (walk2StartMs != 0 && accMean[i].mean < walkAccThre) walk2StopMs = timestamp
-    }
-    if (timestamp >= testData.run2.completionMs && walk2StopMs == 0) {
-        // no stop has been identified, use the manual marker
-        walk2StopMs = timestamp
-    }
-
-    if (timestamp >= testData.run3.walkStartMs && timestamp < testData.run3.completionMs) {
-        // here we expect the walk to start and stop
-        if (walk3StartMs == 0 && accMean[i].mean > walkAccThre) walk3StartMs = timestamp
-        if (walk3StartMs != 0 && accMean[i].mean < walkAccThre) walk3StopMs = timestamp
-    }
-    if (timestamp >= testData.run3.completionMs && walk3StopMs == 0) {
-        // no stop has been identified, use the manual marker
-        walk3StopMs = timestamp
-    }
-
-    if (timestamp >= testData.run1.completionMs && timestamp < testData.run2.waitStartMs) {
-        // here is the turn around
-        if (turn1StartMs == 0 && rotMean[i].mean > turnRotThre) turn1StartMs = timestamp
-        if (turn1StartMs != 0 && turn1StopMs == 0 && rotMean[i].mean < turnRotThre) turn1StopMs = timestamp
-    }
-
-    if (timestamp >= testData.run2.completionMs && timestamp < testData.run3.waitStartMs) {
-        // here is the turn around
-        if (turn2StartMs == 0 && rotMean[i].mean > turnRotThre) turn2StartMs = timestamp
-        if (turn2StartMs != 0 && turn2StopMs == 0 && rotMean[i].mean < turnRotThre) turn2StopMs = timestamp
-    }
+if (state !== 'completion') {
+    state = 'completion'
+    MovingAvgSegmenter.setEvent(state, testData.run3.completionMs)
 }
 
-let walkDur = walk1StopMs - walk1StartMs
-let refDur = reference.run1.walkEnd - reference.run1.walkStart
-console.log(`Walk 1 start: ${walk1StartMs} vs ${reference.run1.walkStart}, stop ${walk1StopMs} vs ${reference.run1.walkEnd}, duration ${walkDur} vs ${refDur}, err: ${refDur - walkDur}`)
+let segments = MovingAvgSegmenter.getSegments()
 
-walkDur = walk2StopMs - walk2StartMs
-refDur = reference.run2.walkEnd - reference.run2.walkStart
-console.log(`Walk 2 start: ${walk2StartMs} vs ${reference.run2.walkStart}, stop ${walk2StopMs} vs ${reference.run2.walkEnd}, duration ${walkDur} vs ${refDur}, err: ${refDur - walkDur}`)
+let dur1 = segments.run1.endMs - segments.run1.startMs
+let refDur1 = reference.run1.walkEnd - reference.run1.walkStart
+let dur2 = segments.run2.endMs - segments.run2.startMs
+let refDur2 = reference.run2.walkEnd - reference.run2.walkStart
+let dur3 = segments.run3.endMs - segments.run3.startMs
+let refDur3 = reference.run3.walkEnd - reference.run3.walkStart
+let durAvg = (dur1 + dur2 + dur3) / 3
+let refAvg = (refDur1 + refDur2 + refDur3) / 3
 
-walkDur = walk3StopMs - walk3StartMs
-refDur = reference.run3.walkEnd - reference.run3.walkStart
-console.log(`Walk 3 start: ${walk3StartMs} vs ${reference.run3.walkStart}, stop ${walk3StopMs} vs ${reference.run3.walkEnd}, duration ${walkDur} vs ${refDur}, err: ${refDur - walkDur}`)
-
-
-console.log(`Turn 1 start: ${turn1StartMs} vs ${reference.run1.turnStart}, stop ${turn1StopMs} vs ${reference.run1.turnEnd}`)
-console.log(`Turn 2 start: ${turn2StartMs} vs ${reference.run2.turnStart}, stop ${turn2StopMs} vs ${reference.run2.turnEnd}`)
-
+console.log(`Duration 1 ${dur1} / ${refDur1}, err ${refDur1 - dur1}`)
+console.log(`Duration 2 ${dur2} / ${refDur2}, err ${refDur2 - dur2}`)
+console.log(`Duration 3 ${dur3} / ${refDur3}, err ${refDur3 - dur3}`)
+console.log(`Avg ${durAvg.toFixed(0)} / ${refAvg.toFixed(0)}, err ${(refAvg - durAvg).toFixed(0)}`)
