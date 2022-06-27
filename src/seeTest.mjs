@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises'
 import plotly from 'nodeplotlib'
 
-const FILE = './data/user1/normal/testresults_15.json'
+const FILE = './data/user1/slow/testresults_17.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)

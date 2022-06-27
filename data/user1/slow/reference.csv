@@ -1,1 +1,3 @@
 filename,walkstart1,walkend1,turnstart1,turnend1,walkstart2,walkend2,turnstart2,turnend2,walkstart3,walkend3
+testresults_16.json,5634,11810,13500,15500,22200,27200,29900,32200,39500,45000
+testresults_17.json,5000,11360,12700,15200,21300,28000,29500,32126,39000,44700

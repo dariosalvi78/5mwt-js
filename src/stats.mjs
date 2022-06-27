@@ -10,9 +10,27 @@ export function mean (values) {
 }
 
 /**
+ * Computes the minimum of an array of numbers
+ * @param {array} values array of numbers
+ * @returns the minumum
+ */
+export function min (values) {
+  return Math.min(...values)
+}
+
+/**
+ * Computes the maximum of an array of numbers
+ * @param {array} values array of numbers
+ * @returns the maximum
+ */
+export function max (values) {
+  return Math.max(...values)
+}
+
+/**
  * Computes the variance of an array of numbers
  * @param {array} values: array of numbers
- * @param {boolean} sample: if true computes sample varaicne instead of population
+ * @param {boolean} sample: if true computes sample variance instead of population
  * @returns variance
  */
 export function variance (values, sample = true) {
@@ -28,7 +46,7 @@ export function variance (values, sample = true) {
  * Source: https://stackoverflow.com/a/45949178/1097607
  */
 export class WindowedRollingStats {
-  constructor (windowSize) {
+  constructor(windowSize) {
     this.reset()
     this.windowSize = windowSize
   }
@@ -97,7 +115,7 @@ export class WindowedRollingStats {
  * Based on the Welford algorithm, see https://www.johndcook.com/blog/standard_deviation/
  */
 export class RollingStats {
-  constructor () {
+  constructor() {
     this.reset()
   }
 
