@@ -59,6 +59,8 @@ for (let i = 0; i < dataUsersDirs.length; i++) {
                         let testData = JSON.parse(testFile)
                         console.log('Test date: ' + testData.startTs.slice(0, 10))
 
+                        MovingAvgSegmenter.reset()
+
                         let state = 'completion'
                         for (let i = 0; i < testData.motion.length; i++) {
                             let ts = testData.motion[i].msFromStart
@@ -113,6 +115,7 @@ for (let i = 0; i < dataUsersDirs.length; i++) {
                         let error = Math.round(refAvg - durAvg)
                         errors.push(error)
 
+                        console.log(`Threshold`, MovingAvgSegmenter.walkAccThre)
                         console.log(`Duration 1 ${dur1} / ${refDur1}, err ${refDur1 - dur1}`)
                         console.log(`Duration 2 ${dur2} / ${refDur2}, err ${refDur2 - dur2}`)
                         console.log(`Duration 3 ${dur3} / ${refDur3}, err ${refDur3 - dur3}`)

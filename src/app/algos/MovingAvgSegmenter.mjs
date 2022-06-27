@@ -1,4 +1,4 @@
-const AVG_TIME_MS = 2000
+const AVG_TIME_MS = 1000
 
 let MovingAvgSegmenter = {
     lastEvent: 'init',
@@ -23,6 +23,9 @@ let MovingAvgSegmenter = {
         startMs: 0,
         endMs: 0,
     },
+
+    // expose the threshold
+    walkAccThre: 0,
 
     setEvent (evt, ts) {
         this.lastEvent = evt
@@ -113,46 +116,60 @@ let MovingAvgSegmenter = {
         let waitAccMean = this.accWaitVal / this.accWaitN
         let walkAccMean = this.accRunVal / this.accRunN
         // compute threshold for detecting walking from smoothed acceleration module
-        let walkAccThre = waitAccMean + ((walkAccMean + waitAccMean) / 3)
+        this.walkAccThre = waitAccMean + ((walkAccMean + waitAccMean) / 3)
 
         for (let i = 0; i < this.accMovAvgs.length; i++) {
-            let timestamp = this.accMovAvgs[i].msFromStart - (AVG_TIME_MS / 2) // compensate for delay, group delay of moving average is half of its length
+            let timestamp = this.accMovAvgs[i].msFromStart // - (AVG_TIME_MS / 2) // compensate for delay, group delay of moving average is half of its length
 
             if (timestamp >= this.userRun1.startMs && timestamp < this.userRun1.endMs) {
                 // here we expect the walk to start and stop
-                if (results.run1.startMs == 0 && this.accMovAvgs[i].mod > walkAccThre) {
+                if (results.run1.startMs == 0 && this.accMovAvgs[i].mod > this.walkAccThre) {
                     results.run1.startMs = timestamp
                     // it can happen that one pauses, in which case endMs can be set, so we must un-sent it
                     if (results.run1.endMs != 0) results.run1.endMs = 0
                 }
-                if (results.run1.startMs != 0 && results.run1.endMs != 0 && this.accMovAvgs[i].mod < walkAccThre) results.run1.endMs = timestamp
+                if (results.run1.startMs != 0 && results.run1.endMs != 0 && this.accMovAvgs[i].mod < this.walkAccThre) results.run1.endMs = timestamp
             }
-            if (timestamp >= results.run1.endMs && results.run1.endMs == 0) {
+            if (timestamp >= this.userRun1.endMs && results.run1.endMs == 0) {
                 // no stop has been identified, use the manual marker
                 results.run1.endMs = this.userRun1.endMs
             }
 
             if (timestamp >= this.userRun2.startMs && timestamp < this.userRun2.endMs) {
-                if (results.run2.startMs == 0 && this.accMovAvgs[i].mod > walkAccThre) {
+                if (results.run2.startMs == 0 && this.accMovAvgs[i].mod > this.walkAccThre) {
+                    console.log('Got run 2 start at ' + timestamp + ' val ' + this.accMovAvgs[i].mod)
                     results.run2.startMs = timestamp
                     if (results.run2.endMs != 0) results.run2.endMs = 0
                 }
-                if (results.run2.startMs != 0 && results.run2.endMs != 0 && this.accMovAvgs[i].mod < walkAccThre) results.run2.endMs = timestamp
+                if ((results.run2.startMs != 0) && (results.run2.endMs == 0) && (this.accMovAvgs[i].mod < this.walkAccThre)) {
+                    console.log('Got run 2 stop at ' + timestamp)
+                    results.run2.endMs = timestamp
+                }
             }
-            if (timestamp >= results.run2.endMs && results.run2.endMs == 0) {
+            if ((timestamp >= this.userRun2.endMs) && results.run2.endMs == 0) {
                 results.run2.endMs = this.userRun2.endMs
             }
 
             if (timestamp >= this.userRun3.startMs && timestamp < this.userRun3.endMs) {
-                if (results.run3.startMs == 0 && this.accMovAvgs[i].mod > walkAccThre) {
+                if (results.run3.startMs == 0 && this.accMovAvgs[i].mod > this.walkAccThre) {
+                    console.log('Got run 3 start at ' + timestamp + ' val ' + this.accMovAvgs[i].mod)
                     results.run3.startMs = timestamp
                     if (results.run3.endMs != 0) results.run3.endMs = 0
                 }
-                if (results.run3.startMs != 0 && results.run3.endMs != 0 && this.accMovAvgs[i].mod < walkAccThre) results.run3.endMs = timestamp
+                if (results.run3.startMs != 0 && (results.run3.endMs == 0) && this.accMovAvgs[i].mod < this.walkAccThre) {
+                    console.log('Got run 3 stop at ' + timestamp)
+                    results.run3.endMs = timestamp
+                }
             }
-            if (timestamp >= results.run3.endMs && results.run3.endMs == 0) {
+            if (timestamp >= this.userRun3.endMs && results.run3.endMs == 0) {
+                console.log('Force run 3 to stop at ' + timestamp)
                 results.run3.endMs = this.userRun3.endMs
             }
+        }
+        // last end timestamp may be outside of the signals
+        if (results.run3.endMs == 0) {
+            console.log('Force run 3 to stop at ' + this.userRun3.endMs)
+            results.run3.endMs = this.userRun3.endMs
         }
         return results
     },
@@ -160,20 +177,19 @@ let MovingAvgSegmenter = {
     reset () {
         this.lastEvent = 'init'
         this.accBuffer = []
-        this.accMovingAvg = 0
+        this.accMovingAvgAccum = 0
+        this.accMovAvgs = []
         this.accWaitN = 0
         this.accWaitVal = 0
         this.accRunN = 0
         this.accRunVal = 0
+        this.walkAccThre = []
         this.userRun1.startMs = 0
         this.userRun1.endMs = 0
-        this.userRun1.accRun = []
         this.userRun2.startMs = 0
         this.userRun2.endMs = 0
-        this.userRun2.accRun = []
         this.userRun3.startMs = 0
         this.userRun3.endMs = 0
-        this.userRun3.accRun = []
     }
 }
 

@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises'
 import plotly from 'nodeplotlib'
 import MovingAvgSegmenter from './app/algos/MovingAvgSegmenter.mjs'
 
-const FILE = './data/user1/normal/testresults_11.json'
+const FILE = './data/user1/slow/testresults_16.json'
 let file = await readFile(FILE, 'utf8')
 
 let testData = JSON.parse(file)
@@ -12,7 +12,7 @@ const REFFILE = FILE.substring(0, FILE.lastIndexOf('/')) + '/reference.csv'
 let refFile = await readFile(REFFILE, 'utf8')
 
 
-const DOPLOT = false
+const DOPLOT = true
 
 // utility functions
 Object.byString = function (o, s) {
@@ -172,6 +172,9 @@ if (state !== 'completion') {
     MovingAvgSegmenter.setEvent(state, testData.run3.completionMs)
 }
 
+plotSignals('Filtered module', MovingAvgSegmenter.accMovAvgs, ['mod'])
+
+
 let segments = MovingAvgSegmenter.getSegments()
 
 let dur1 = segments.run1.endMs - segments.run1.startMs
@@ -183,6 +186,7 @@ let refDur3 = reference.run3.walkEnd - reference.run3.walkStart
 let durAvg = (dur1 + dur2 + dur3) / 3
 let refAvg = (refDur1 + refDur2 + refDur3) / 3
 
+console.log(`Threshold: ${MovingAvgSegmenter.walkAccThre.toFixed(2)}`)
 console.log(`Duration 1 ${dur1} / ${refDur1}, err ${refDur1 - dur1}`)
 console.log(`Duration 2 ${dur2} / ${refDur2}, err ${refDur2 - dur2}`)
 console.log(`Duration 3 ${dur3} / ${refDur3}, err ${refDur3 - dur3}`)
