@@ -126,10 +126,6 @@ let plotSignals = function (title, data, valNames) {
     })
 }
 
-plotSignals('Acceleration (no g)', testData.motion, ['acc.x', 'acc.y', 'acc.z'])
-plotSignals('Rotation rate', testData.motion, ['rotRate.alpha', 'rotRate.beta', 'rotRate.gamma'])
-plotSignals('Orientation', testData.orientation, ['alpha', 'beta', 'gamma'])
-
 let reference = getReferece()
 
 let state = 'completion'
@@ -172,7 +168,10 @@ if (state !== 'completion') {
     MovingAvgSegmenter.setEvent(state, testData.run3.completionMs)
 }
 
+plotSignals('Acceleration (no g)', testData.motion, ['acc.x', 'acc.y', 'acc.z'])
+plotSignals('Rotation rate', testData.motion, ['rotRate.alpha', 'rotRate.beta', 'rotRate.gamma'])
 plotSignals('Filtered module', MovingAvgSegmenter.accMovAvgs, ['mod'])
+plotSignals('Orientation', testData.orientation, ['alpha', 'beta', 'gamma'])
 
 
 let segments = MovingAvgSegmenter.getSegments()
@@ -187,7 +186,7 @@ let durAvg = (dur1 + dur2 + dur3) / 3
 let refAvg = (refDur1 + refDur2 + refDur3) / 3
 
 console.log(`Threshold: ${MovingAvgSegmenter.walkAccThre.toFixed(2)}`)
-console.log(`Duration 1 ${dur1} / ${refDur1}, err ${refDur1 - dur1}`)
-console.log(`Duration 2 ${dur2} / ${refDur2}, err ${refDur2 - dur2}`)
-console.log(`Duration 3 ${dur3} / ${refDur3}, err ${refDur3 - dur3}`)
+console.log(`Walk start 1: ${segments.run1.startMs}, end: ${segments.run1.endMs}, err: ${refDur1 - dur1}`)
+console.log(`Walk start 2: ${segments.run2.startMs}, end: ${segments.run2.endMs}, err: ${refDur2 - dur2}`)
+console.log(`Walk start 3: ${segments.run3.startMs}, end: ${segments.run3.endMs}, err: ${refDur3 - dur3}`)
 console.log(`Avg ${durAvg.toFixed(0)} / ${refAvg.toFixed(0)}, err ${(refAvg - durAvg).toFixed(0)}`)

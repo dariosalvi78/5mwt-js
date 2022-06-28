@@ -57,7 +57,6 @@ for (let i = 0; i < dataUsersDirs.length; i++) {
                         console.log('Processing: ' + dataFilePath)
                         let testFile = await readFile(dataFilePath, 'utf8')
                         let testData = JSON.parse(testFile)
-                        console.log('Test date: ' + testData.startTs.slice(0, 10))
 
                         MovingAvgSegmenter.reset()
 
@@ -115,11 +114,7 @@ for (let i = 0; i < dataUsersDirs.length; i++) {
                         let error = Math.round(refAvg - durAvg)
                         errors.push(error)
 
-                        console.log(`Threshold`, MovingAvgSegmenter.walkAccThre)
-                        console.log(`Duration 1 ${dur1} / ${refDur1}, err ${refDur1 - dur1}`)
-                        console.log(`Duration 2 ${dur2} / ${refDur2}, err ${refDur2 - dur2}`)
-                        console.log(`Duration 3 ${dur3} / ${refDur3}, err ${refDur3 - dur3}`)
-                        console.log(`Avg ${durAvg.toFixed(0)} / ${refAvg.toFixed(0)}, err ${error}`)
+                        console.log(`Errors 1) ${refDur1 - dur1} 2) ${refDur2 - dur2} 3) ${refDur3 - dur3} <-> avg) ${error}`)
                     }
                 }
             }
@@ -127,10 +122,13 @@ for (let i = 0; i < dataUsersDirs.length; i++) {
     }
 }
 
-console.log('Mean error:', Math.round(mean(errors)))
-console.log('  SD:', Math.round(Math.sqrt(variance(errors, false))))
+let mearErr = Math.round(mean(errors))
+let sdErr = Math.round(Math.sqrt(variance(errors, false)))
+console.log('Mean error:', mearErr)
+console.log('  SD:', sdErr)
 console.log('  Min:', min(errors))
 console.log('  Max:', max(errors))
+console.log('  Limits of agreement: ', mearErr - (1.96 * sdErr), mearErr + (1.96 * sdErr))
 
 console.log('Mean absolute error:', Math.round(mean(errors.map(e => Math.abs(e)))))
 console.log('  SD:', Math.round(Math.sqrt(variance(errors.map(e => Math.abs(e)), false))))
